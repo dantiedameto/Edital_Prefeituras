@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TenderCategory {
+  CONSTRUCAO_CIVIL
+  TECNOLOGIA
+  LIMPEZA
+  ALIMENTACAO
+  TRANSPORTE
+  SEGURANCA
+  SAUDE
+  EDUCACAO
+  MANUTENCAO
+  SERVICOS_GERAIS
+}
+
+enum TenderModality {
+  PREGAO_ELETRONICO
+  CONCORRENCIA
+  TOMADA_DE_PRECOS
+  CONVITE
+  DISPENSA
+  INEXIGIBILIDADE
+  RDC
+  CONCURSO
+}
+
+enum TenderStatus {
+  OPEN
+  CLOSED
+  IN_REVIEW
+}
+
+enum AlertStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+enum ScraperLogStatus {
+  SUCCESS
+  FAILED
+  RUNNING
+}
+
+model Plan {
+  id                 String   @id @default(uuid())
+  name               String
+  slug               String   @unique
+  maxFilters         Int?
+  maxFavorites       Int?
+  maxTenderResults   Int?
+  emailAlertsEnabled Boolean  @default(false)
+  priceCents         Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  users User[]
+
+  @@map("plans")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  city         String
+  state        String
+  companyType  String
+  planId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  plan      Plan             @relation(fields: [planId], references: [id])
+  filters   InterestFilter[]
+  favorites Favorite[]
+  alerts    Alert[]
+
+  @@map("users")
+}
+
+model Tender {
+  id              String         @id @default(uuid())
+  title           String
+  description     String
+  publicOrg       String
+  city            String
+  state           String
+  category        TenderCategory
+  modality        TenderModality
+  estimatedValue  Decimal        @db.Decimal(14, 2)
+  publicationDate DateTime
+  deadlineDate    DateTime
+  originalLink    String?        @unique
+  source          String
+  status          TenderStatus   @default(OPEN)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  favorites Favorite[]
+  alerts    Alert[]
+
+  @@unique([title, publicOrg, publicationDate])
+  @@map("tenders")
+}
+
+model InterestFilter {
+  id        String          @id @default(uuid())
+  userId    String
+  city      String?
+  state     String?
+  keyword   String?
+  category  TenderCategory?
+  minValue  Decimal?        @db.Decimal(14, 2)
+  maxValue  Decimal?        @db.Decimal(14, 2)
+  publicOrg String?
+  modality  TenderModality?
+  createdAt DateTime        @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("interest_filters")
+}
+
+model Alert {
+  id        String      @id @default(uuid())
+  userId    String
+  tenderId  String
+  status    AlertStatus @default(NEW)
+  createdAt DateTime    @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tender Tender @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenderId])
+  @@map("alerts")
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  tenderId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tender Tender @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenderId])
+  @@map("favorites")
+}
+
+model ScraperLog {
+  id             String            @id @default(uuid())
+  startedAt      DateTime          @default(now())
+  finishedAt     DateTime?
+  status         ScraperLogStatus  @default(RUNNING)
+  tendersFound   Int               @default(0)
+  tendersCreated Int               @default(0)
+  errorMessage   String?
+  source         String
+
+  @@map("scraper_logs")
+}

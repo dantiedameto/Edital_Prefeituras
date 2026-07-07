@@ -1,0 +1,258 @@
+Crie um projeto web completo chamado **Central de Editais Públicos**, usando **Docker**, com foco em empresas e prestadores de serviço que querem acompanhar licitações e editais públicos por cidade, categoria e palavra-chave.
+
+O sistema deve permitir que usuários cadastrem filtros de interesse e recebam alertas quando novos editais compatíveis forem encontrados.
+
+## Objetivo do projeto
+
+Desenvolver um MVP funcional de uma plataforma SaaS para monitoramento de editais públicos.
+
+## Stack sugerida
+
+Use:
+
+* Backend: Node.js com NestJS ou Express
+* Frontend: Next.js com TypeScript
+* Banco de dados: PostgreSQL
+* ORM: Prisma
+* Filas/tarefas agendadas: BullMQ com Redis ou cron jobs
+* Autenticação: JWT ou NextAuth
+* E-mail: integração preparada para SMTP
+* Docker e Docker Compose para rodar todo o projeto localmente
+
+## Funcionalidades principais
+
+### 1. Autenticação
+
+Criar:
+
+* Cadastro de usuário
+* Login
+* Logout
+* Proteção de rotas
+* Perfil do usuário
+
+Campos do usuário:
+
+* Nome
+* E-mail
+* Senha criptografada
+* Cidade
+* Estado
+* Tipo de empresa
+* Plano: gratuito ou premium
+
+### 2. Cadastro de interesses
+
+O usuário deve conseguir criar filtros como:
+
+* Cidade
+* Estado
+* Palavra-chave
+* Categoria
+* Valor estimado mínimo e máximo
+* Órgão público
+* Modalidade da licitação
+
+Exemplos de categorias:
+
+* Construção civil
+* Tecnologia
+* Limpeza
+* Alimentação
+* Transporte
+* Segurança
+* Saúde
+* Educação
+* Manutenção
+* Serviços gerais
+
+### 3. Cadastro e listagem de editais
+
+Criar uma tabela de editais com os campos:
+
+* Título
+* Descrição
+* Órgão público
+* Cidade
+* Estado
+* Categoria
+* Modalidade
+* Valor estimado
+* Data de publicação
+* Data limite
+* Link original
+* Fonte
+* Status: aberto, encerrado ou em análise
+
+O sistema deve permitir:
+
+* Listar editais
+* Buscar por palavra-chave
+* Filtrar por cidade, estado, categoria e status
+* Ver detalhes do edital
+* Salvar edital como favorito
+
+### 4. Robô de busca de editais
+
+Criar uma estrutura preparada para buscar editais diariamente.
+
+Nesta primeira versão, implemente um scraper/mock service que:
+
+* Rode automaticamente uma vez por dia
+* Simule a busca de novos editais
+* Salve os editais no banco
+* Evite duplicidade pelo link original ou título + órgão + data
+* Registre logs da execução
+
+Deixe a arquitetura preparada para futuramente integrar fontes reais como:
+
+* Portal Nacional de Contratações Públicas
+* Portais de prefeituras
+* Portais de governos estaduais
+* Diários oficiais
+
+### 5. Sistema de alertas
+
+Quando um novo edital for cadastrado, o sistema deve verificar se ele combina com os filtros dos usuários.
+
+Se combinar, criar um alerta no painel do usuário.
+
+Campos do alerta:
+
+* Usuário
+* Edital
+* Data de criação
+* Status: novo, lido ou arquivado
+
+Também preparar envio por e-mail, mas pode deixar o envio real como mock ou serviço SMTP configurável.
+
+### 6. Dashboard
+
+Criar uma área logada com:
+
+* Total de editais encontrados
+* Total de alertas novos
+* Editais próximos do prazo final
+* Editais favoritos
+* Filtros cadastrados
+* Últimos editais encontrados
+
+### 7. Plano gratuito e premium
+
+Implementar uma lógica simples:
+
+Plano gratuito:
+
+* Até 3 filtros cadastrados
+* Alertas apenas no painel
+* Visualização limitada
+
+Plano premium:
+
+* Filtros ilimitados
+* Alertas por e-mail
+* Favoritos ilimitados
+* Acesso completo
+
+Não precisa integrar pagamento agora, apenas deixar a estrutura pronta.
+
+## Telas necessárias
+
+Criar as seguintes telas:
+
+* Landing page
+* Cadastro
+* Login
+* Dashboard
+* Lista de editais
+* Detalhe do edital
+* Meus filtros
+* Meus alertas
+* Favoritos
+* Perfil do usuário
+* Página de planos
+
+## Landing page
+
+A landing page deve explicar claramente o problema:
+
+“Muitas empresas perdem oportunidades em licitações porque não acompanham editais diariamente.”
+
+Mostrar benefícios:
+
+* Receba alertas automáticos
+* Filtre editais por cidade e categoria
+* Economize tempo procurando oportunidades
+* Nunca perca um prazo importante
+* Ideal para pequenas empresas e prestadores de serviço
+
+Adicionar CTA:
+
+* Criar conta grátis
+* Ver planos
+
+## Docker
+
+O projeto deve conter:
+
+* Dockerfile para frontend
+* Dockerfile para backend
+* docker-compose.yml
+* Serviço PostgreSQL
+* Serviço Redis, se usar filas
+* Variáveis de ambiente em `.env.example`
+* Comando único para subir tudo:
+
+```bash
+docker compose up --build
+```
+
+## Banco de dados
+
+Criar schema Prisma com as entidades:
+
+* User
+* Tender/Edital
+* InterestFilter
+* Alert
+* Favorite
+* ScraperLog
+* Plan
+
+Criar seed com alguns editais fictícios para teste.
+
+## Requisitos técnicos
+
+* Código organizado
+* TypeScript
+* Validação de dados
+* Tratamento de erros
+* README explicando como rodar
+* Arquitetura limpa e fácil de expandir
+* Componentes reutilizáveis
+* Layout responsivo
+* Interface moderna e profissional
+* Não usar dados reais sensíveis
+* Usar dados mockados quando necessário
+
+## Resultado esperado
+
+Ao final, quero um projeto funcional que rode com Docker e permita:
+
+1. Criar conta
+2. Fazer login
+3. Cadastrar filtros de interesse
+4. Visualizar editais
+5. Receber alertas no painel
+6. Favoritar editais
+7. Simular busca diária de novos editais
+8. Consultar logs das buscas
+
+Antes de começar a codar, gere primeiro:
+
+1. Estrutura de pastas do projeto
+2. Arquitetura recomendada
+3. Modelagem do banco
+4. Plano de implementação em etapas
+
+Depois implemente o projeto completo seguindo essa arquitetura.
