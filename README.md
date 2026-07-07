@@ -88,8 +88,8 @@ Públicas ou um diário oficial real é só implementar a interface e registrar 
 Pré-requisitos: Docker e Docker Compose.
 
 ```bash
-git clone <url-deste-repositorio>
-cd central-editais-publicos
+git clone https://github.com/dantiedameto/Edital_Prefeituras.git
+cd Edital_Prefeituras
 cp .env.example .env
 docker compose up --build
 ```
